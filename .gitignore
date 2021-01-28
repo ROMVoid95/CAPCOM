@@ -3,3 +3,7 @@
 
 # Ignore Gradle build output directory
 build
+cache.json
+cacheLock
+config.json
+logs/current.log

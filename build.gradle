@@ -9,8 +9,8 @@ plugins {
     id 'com.palantir.docker' version '0.25.0'
 }
 
-mainClassName = "net.romvoid95.discord.CapcomBot"
-def ver = new Version(major: 6, minor: 1, revision: 1)
+mainClassName = "net.romvoid95.discord.CapCom"
+def ver = new Version(major: 1, minor: 1, revision: 0)
 version ver.toString()
 
 repositories {
@@ -19,46 +19,26 @@ repositories {
 }
 
 dependencies {
-    compile ('net.dv8tion:JDA:4.2.0_225'){
+    implementation ('net.dv8tion:JDA:4.2.0_225'){
         transitive = true
         exclude module: 'opus-java'
     }
-	implementation 'ch.qos.logback:logback-classic:1.2.3'
-	implementation 'com.google.guava:guava:30.1-jre'
-	implementation 'org.apache.commons:commons-lang3:3.11'
-	implementation 'org.apache.commons:commons-text:1.9'
-	//Unit tests
-	testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    implementation group: 'com.jagrosh', name: 'jda-utilities', version: '3.0.5'
+	implementation group: 'club.minnced', name: 'discord-webhooks', version: '0.5.4-rc'
+	implementation 'com.fasterxml.jackson.core:jackson-core:2.12.1'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.1'
+	implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
+	implementation group: 'org.apache.commons', name: 'commons-text', version: '1.9'
+	
+	implementation group: 'org.reflections', name: 'reflections', version: '0.9.12'
+	
+	compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
+	annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
+	
+	testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
+	testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
 }
-
-def lint = [
-	"auxiliaryclass",
-	"cast",
-	"classfile",
-	"deprecation",
-	"dep-ann",
-	"divzero",
-	"empty",
-	"exports",
-	"fallthrough",
-	"finally",
-	"module",
-	"opens",
-	"options",
-	"overloads",
-	"overrides",
-	"path",
-	"rawtypes",
-	"removal",
-	"requires-automatic",
-	"requires-transitive-automatic",
-	"serial",
-	"static",
-	"try",
-	"unchecked",
-	"varargs",
-	"preview"
-]
 
 import org.apache.tools.ant.filters.ReplaceTokens
 
@@ -97,7 +77,6 @@ task generateJavaSources(type: SourceTask) {
 compileJava {
 	source = generateJavaSources.source
 	classpath = sourceSets.main.compileClasspath
-	options.compilerArgs += ["-Xlint:${lint.join(",")}"]
 
 	dependsOn generateJavaSources
 }
@@ -110,8 +89,12 @@ tasks.withType(JavaCompile) {
 build.dependsOn shadowJar
 
 shadowJar {
-	archiveClassifier.set(null)
-	exclude 'module-info.class'
+	archiveName = "CapComBot-" + project.version + ".jar"
+    manifest {
+        attributes(
+                'Main-Class': mainClassName
+        )
+    }
 }
 
 class Version {
